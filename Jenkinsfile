@@ -3,8 +3,8 @@ pipeline {
 
     triggers {
         // Cron format: MIN HOUR DOM MON DOW
-        // This runs every day at 12:02 AM
-        cron('2 0 * * *')
+         // Runs every day at 12:25 AM
+        cron('25 0 * * *')
     }
 
     stages {
