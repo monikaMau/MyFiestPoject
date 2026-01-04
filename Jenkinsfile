@@ -1,44 +1,52 @@
 pipeline {
-
     agent any
 
     triggers {
         cron('H/5 * * * *')
     }
 
+    tools {
+        maven 'Maven'
+    }
+
     stages {
 
-        stage('Step 1 - Get Code') {
+        stage('Checkout Code') {
             steps {
-                echo 'Pulling code from Git'
+                git 'https://github.com/monikaMau/MyFiestPoject.git'
             }
         }
 
-        stage('Step 2 - Build') {
+        stage('Build') {
             steps {
-                echo 'Building the application'
+                bat 'mvn clean compile'
             }
         }
 
-        stage('Step 3 - Test') {
+        stage('Run Selenium Tests (Headless)') {
             steps {
-                echo 'Running tests'
-            }
-        }
-
-        stage('Step 4 - Deploy') {
-            steps {
-                echo 'Deploying application'
+                bat 'mvn test'
             }
         }
     }
 
     post {
-        success {
-            echo 'SUCCESS: Pipeline finished'
+        always {
+            publishHTML([
+                reportDir: 'target/surefire-reports',
+                reportFiles: 'index.html',
+                reportName: 'Selenium TestNG Report',
+                keepAll: true,
+                alwaysLinkToLastBuild: true
+            ])
         }
+
+        success {
+            echo 'All Selenium tests passed'
+        }
+
         failure {
-            echo 'FAILED: Pipeline error'
+            echo 'Some Selenium tests failed'
         }
     }
 }
