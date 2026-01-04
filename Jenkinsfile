@@ -2,38 +2,39 @@ pipeline {
     agent any
 
     triggers {
-        cron('H/5 * * * *')
+        cron('H/5 * * * *') // every 5 minutes
     }
 
     tools {
-        maven 'Maven'  // Make sure "Maven" is configured in Jenkins
+        maven 'Maven'
     }
 
     stages {
 
         stage('Checkout Code') {
-    steps {
-        git branch: 'selenium_prpject', url: 'https://github.com/monikaMau/MyFiestPoject.git'
-    }
-}
-
-        stage('Build Project') {
             steps {
-                bat 'mvn clean compile'
+                git branch: 'selenium_prpject', url: 'https://github.com/monikaMau/MyFiestPoject.git'
+            }
+        }
+
+        stage('Build & Test Project') {
+            steps {
+                // compile + run tests to generate reports
+                bat 'mvn clean test'
             }
         }
 
         stage('Deploy Application (CD)') {
             steps {
                 echo 'Deploying application to staging server'
-                // Example: copy files to a folder
-                bat 'xcopy /s /y app_folder C:\\deploy\\app'
+                // Adjust this path to your actual artifact
+                // bat 'xcopy /s /y target\\seleniumframeworkproject-0.0.1-SNAPSHOT.jar C:\\deploy\\app'
             }
         }
 
         stage('Run Selenium Tests (Headless)') {
             steps {
-                bat 'mvn test'
+                echo 'Selenium tests already ran in mvn test'
             }
         }
     }
