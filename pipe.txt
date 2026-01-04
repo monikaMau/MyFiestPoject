@@ -1,0 +1,139 @@
+Perfect! Let’s create a **complete step-by-step guide with commands and configurations** for your Jenkins + Selenium CI/CD pipeline. This will serve as a **future reference** for learning and replicating pipelines. I’ll organize it stage by stage, including **everything you did**.
+
+---
+
+# **Step-by-Step Jenkins CI/CD Pipeline with Selenium Automation**
+
+---
+
+## **1️⃣ Install & Setup Jenkins**
+
+* Installed Jenkins on Windows (`C:\ProgramData\Jenkins`)
+
+* Installed required **plugins**:
+
+  * **Pipeline**
+  * **Git plugin**
+  * **Maven Integration plugin**
+  * **HTML Publisher plugin**
+
+* Configured **global tools** in Jenkins:
+
+  * **Maven** → Name: `Maven`, Path: `C:\Program Files\Apache\Maven\bin`
+  * **Git** → Installed via `Git for Windows` (tested with `git --version`)
+
+---
+
+## **2️⃣ Create a New Pipeline Job**
+
+1. Go to Jenkins Dashboard → **New Item**
+2. Enter Job Name → `selenium-ci-cd-pipeline`
+3. Select **Pipeline** → Click **OK**
+4. Configure:
+
+   * **Pipeline Definition** → `Pipeline script from SCM`
+   * **SCM** → Git
+   * **Repository URL** → `https://github.com/monikaMau/MyFiestPoject.git`
+   * **Branch to build** → `selenium_prpject`
+
+---
+
+## **3️⃣ Jenkinsfile Setup**
+
+Create a `Jenkinsfile` in your repo (root directory). Here’s what you used:
+
+```groovy
+pipeline {
+    agent any
+
+    triggers {
+        cron('H/5 * * * *') // Trigger pipeline every 5 minutes
+    }
+
+    tools {
+        maven 'Maven'  // Use the Maven installation configured in Jenkins
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'selenium_prpject', url: 'https://github.com/monikaMau/MyFiestPoject.git'
+            }
+        }
+
+        stage('Build & Test Project') {
+            steps {
+                // Compile and run Selenium TestNG tests
+                bat 'mvn clean test'
+            }
+        }
+
+        stage('Deploy Application (CD)') {
+            steps {
+                echo 'Deploying application to staging server'
+                // Example deploy command (adjust path to your artifact)
+                // bat 'xcopy /s /y target\\seleniumframeworkproject-0.0.1-SNAPSHOT.jar C:\\deploy\\app'
+            }
+        }
+
+        stage('Run Selenium Tests (Headless)') {
+            steps {
+                echo 'Selenium tests already executed during mvn test'
+            }
+        }
+    }
+
+    post {
+        always {
+            publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'target/surefire-reports',
+                reportFiles: 'index.html',
+                reportName: 'Selenium TestNG Report'
+            ])
+        }
+
+        success {
+            echo 'Pipeline finished successfully'
+        }
+
+        failure {
+            echo 'Pipeline failed'
+        }
+    }
+}
+
+* This triggers the pipeline automatically, fetching latest code, building, testing, deploying, and publishing reports.
+
+---
+
+## **8️⃣ Troubleshooting Tips**
+
+* **Branch errors**: Make sure the branch name in Jenkins matches GitHub exactly (`selenium_prpject`)
+* **Workspace issues**: Use **Wipe Out Workspace** if builds fail repeatedly
+* **Missing HTML reports**: Make sure Maven tests are run (`mvn test`) before publishing reports
+* **Deploy stage fails**: Verify the artifact path exists
+
+---
+
+## **9️⃣ Summary Workflow**
+
+1. Jenkins triggers → fetches code from GitHub
+2. Jenkins builds project using Maven
+3. Selenium tests run (headless) via Maven TestNG
+4. Deploys artifact (CD) to staging folder
+5. Publishes HTML test report
+6. Scheduled every 5 minutes → full CI/CD automation
+
+---
+
+✅ With this guide, you can **reuse it anytime for learning or creating similar pipelines**.
+
+---
+
+If you want, I can also **draw a small diagram showing the pipeline stages visually**, which is super helpful to **attach to your notes or LinkedIn post**.
+
+Do you want me to do that?

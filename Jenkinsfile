@@ -1,19 +1,15 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'JAVA_Home'
-    maven 'Maven'    }
-
-    environment {
-        // Add environment variables if needed
-        DEPLOY_PATH = 'C:\\deploy\\app'
+    triggers {
+        // Cron format: MIN HOUR DOM MON DOW
+        // This runs every day at 12:02 AM
+        cron('2 0 * * *')
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                // Checkout from GitHub branch
                 git branch: 'selenium_prpject',
                     url: 'https://github.com/monikaMau/MyFiestPoject.git'
             }
@@ -29,45 +25,42 @@ pipeline {
         stage('Run Selenium Tests (Headless)') {
             steps {
                 echo 'Running Selenium tests with TestNG suite'
-                // Continue pipeline even if tests fail
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    bat 'mvn clean test -DsuiteXmlFile=src/test/resources/testng.xml'
-                }
+                bat 'mvn clean test -DsuiteXmlFile=src/test/resources/testng.xml'
             }
         }
 
         stage('Deploy Application (CD)') {
             steps {
                 echo 'Deploying application to staging server'
-                // Example: copy artifact to deploy folder
-                bat """
+                bat '''
                 if exist target\\* (
-                    xcopy /s /y target\\* %DEPLOY_PATH%
+                    xcopy /s /y target\\* C:\\deploy\\app
                 ) else (
                     echo No build artifact found to deploy
                 )
-                """
+                '''
+            }
+        }
+
+        stage('Publish Reports') {
+            steps {
+                echo 'Publishing Selenium HTML TestNG reports'
+                publishHTML([
+                    reportName: 'Selenium TestNG Report',
+                    reportDir: 'target\\surefire-reports',
+                    reportFiles: 'index.html',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: false
+                ])
             }
         }
     }
 
     post {
-        always {
-            echo 'Publishing Selenium HTML TestNG reports'
-            publishHTML([
-                allowMissing: true,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: 'target/surefire-reports',
-                reportFiles: 'emailable-report.html', // Change to index.html if you have it
-                reportName: 'Selenium TestNG Report'
-            ])
-        }
-
         success {
-            echo 'Pipeline finished successfully!'
+            echo 'Pipeline executed successfully!'
         }
-
         failure {
             echo 'Pipeline finished with failures.'
         }
