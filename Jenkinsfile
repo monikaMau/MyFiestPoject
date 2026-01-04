@@ -6,7 +6,7 @@ pipeline {
     }
 
     tools {
-        maven 'Maven'
+        maven 'Maven'  // Make sure "Maven" is configured in Jenkins
     }
 
     stages {
@@ -17,9 +17,17 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Project') {
             steps {
                 bat 'mvn clean compile'
+            }
+        }
+
+        stage('Deploy Application (CD)') {
+            steps {
+                echo 'Deploying application to staging server'
+                // Example: copy files to a folder
+                bat 'xcopy /s /y app_folder C:\\deploy\\app'
             }
         }
 
@@ -33,20 +41,21 @@ pipeline {
     post {
         always {
             publishHTML([
+                allowMissing: true,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
                 reportDir: 'target/surefire-reports',
                 reportFiles: 'index.html',
-                reportName: 'Selenium TestNG Report',
-                keepAll: true,
-                alwaysLinkToLastBuild: true
+                reportName: 'Selenium TestNG Report'
             ])
         }
 
         success {
-            echo 'All Selenium tests passed'
+            echo 'Pipeline finished successfully'
         }
 
         failure {
-            echo 'Some Selenium tests failed'
+            echo 'Pipeline failed'
         }
     }
 }
