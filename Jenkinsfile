@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'   // Name of Maven installation configured in Jenkins
-        jdk 'JDK 1.8'   // Name of JDK installation configured in Jenkins
-    }
+        jdk 'JAVA_Home'
+    maven 'Maven'    }
 
     environment {
         // Add environment variables if needed
