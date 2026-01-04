@@ -12,10 +12,10 @@ pipeline {
     stages {
 
         stage('Checkout Code') {
-            steps {
-                git 'https://github.com/monikaMau/MyFiestPoject.git'
-            }
-        }
+    steps {
+        git branch: 'selenium_prpject', url: 'https://github.com/monikaMau/MyFiestPoject.git'
+    }
+}
 
         stage('Build Project') {
             steps {
