@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        cron('41 0 * * *') // 12:41 AM daily
+        cron('50 0 * * *') // 12:41 AM daily
     }
     tools {
         jdk 'JAVA_Home'      // Your Jenkins JDK short name
