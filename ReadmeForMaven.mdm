@@ -1,0 +1,143 @@
+Here is a **clean, step-by-step guide** for setting up Maven + TestNG project and running tests from terminal — exactly in the correct order and very easy to follow.
+
+---
+
+# ✅ **Steps to Configure Maven, Add Plugin & Run TestNG from Terminal**
+
+---
+
+## **🔹 Step 1 — Add Surefire Plugin in `pom.xml`**
+
+This plugin tells Maven to run TestNG tests.
+
+
+	<build>
+		<plugins>
+			<!-- Compiler Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
+				</configuration>
+			</plugin>
+
+			<!-- Surefire Plugin -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${surefire.version}</version>
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+					<testFailureIgnore>false</testFailureIgnore>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
+---
+
+## **🔹 Step 2 — Download & Install Apache Maven**
+
+1. Go to Maven official site
+   Download → **Binary Zip**
+2. Extract it
+3. Move folder to:
+
+   ```
+   C:\Program Files\apache-maven-3.xx
+   ```
+
+---
+
+## **🔹 Step 3 — Add Maven to Eclipse**
+
+1. Go to **Window → Preferences**
+2. Select **Maven → Installations**
+3. Click **Add**
+4. Browse to:
+
+   ```
+   C:\Program Files\apache-maven-3.xx
+   ```
+5. Select the folder → OK
+6. Tick ✔ that Maven installation → Apply → OK
+
+---
+
+## **🔹 Step 4 — Set Maven Environment Variable**
+
+### 1️⃣ Add MAVEN_HOME
+
+Control Panel → System → Advanced System Settings → Environment Variables → New
+
+```
+Variable name: MAVEN_HOME
+Variable value: C:\Program Files\apache-maven-3.xx
+```
+
+### 2️⃣ Add Maven to PATH
+
+Edit **Path** → Add
+
+```
+%MAVEN_HOME%\bin
+```
+
+---
+
+## **🔹 Step 5 — Verify Maven Installation**
+
+Open CMD and run:
+
+```
+mvn -v
+```
+
+If output shows Maven version → it's installed correctly.
+
+---
+
+## **🔹 Step 6 — Go to Your Project Folder**
+
+Example:
+
+```
+cd C:\Users\HP\eclipse-workspace\seleniumframeworkproject
+```
+
+---
+
+## **🔹 Step 7 — Run Maven Commands**
+
+### 🔸 Clean project
+
+```
+mvn clean
+```
+
+### 🔸 Run TestNG test suite
+
+```
+mvn clean test
+```
+
+Maven will automatically run your `testng.xml` from:
+
+```
+src/test/resources/testng.xml
+```
+
+---
+
+cmd to rum xml:- mvn clean test -DsuiteXmlFile=src/test/resources/testng.xml
+
+
+
+# ✔ Done!
+
+Now your Maven + TestNG setup is 100% correct and terminal execution works.
