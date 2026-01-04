@@ -1,12 +1,13 @@
 pipeline {
     agent any
     triggers {
-        cron('30 0 * * *') // 12:25 AM daily
+        cron('37 0 * * *') // 12:25 AM daily
     }
-    environment {
-        MAVEN_HOME = "C:\\Program Files\\Apache\\maven"
-        REPORT_DIR = "C:\\QAReports"
+    tools {
+        jdk 'JAVA_Home'      // Your Jenkins JDK short name
+        maven 'Maven'  // Your Jenkins Maven short name
     }
+
     stages {
         stage('Checkout Code') {
             steps {
