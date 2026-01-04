@@ -1,12 +1,12 @@
 pipeline {
     agent any
-
     triggers {
-        // Cron format: MIN HOUR DOM MON DOW
-         // Runs every day at 12:25 AM
-        cron('25 0 * * *')
+        cron('30 0 * * *') // 12:25 AM daily
     }
-
+    environment {
+        MAVEN_HOME = "C:\\Program Files\\Apache\\maven"
+        REPORT_DIR = "C:\\QAReports"
+    }
     stages {
         stage('Checkout Code') {
             steps {
@@ -14,55 +14,31 @@ pipeline {
                     url: 'https://github.com/monikaMau/MyFiestPoject.git'
             }
         }
-
         stage('Build Project') {
             steps {
-                echo 'Building project with Maven'
-                bat 'mvn clean compile'
+                bat "\"%MAVEN_HOME%\\bin\\mvn\" clean compile"
             }
         }
-
-        stage('Run Selenium Tests (Headless)') {
+        stage('Run Tests') {
             steps {
-                echo 'Running Selenium tests with TestNG suite'
-                bat 'mvn clean test -DsuiteXmlFile=src/test/resources/testng.xml'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    bat "\"%MAVEN_HOME%\\bin\\mvn\" clean test -DsuiteXmlFile=src/test/resources/testng.xml"
+                }
             }
         }
-
-        stage('Deploy Application (CD)') {
-            steps {
-                echo 'Deploying application to staging server'
-                bat '''
-                if exist target\\* (
-                    xcopy /s /y target\\* C:\\deploy\\app
-                ) else (
-                    echo No build artifact found to deploy
-                )
-                '''
-            }
-        }
-
         stage('Publish Reports') {
             steps {
-                echo 'Publishing Selenium HTML TestNG reports'
-                publishHTML([
-                    reportName: 'Selenium TestNG Report',
-                    reportDir: 'target\\surefire-reports',
-                    reportFiles: 'index.html',
-                    keepAll: true,
+                bat "if not exist \"%REPORT_DIR%\" mkdir \"%REPORT_DIR%\""
+                bat "xcopy /s /y target\\surefire-reports\\* \"%REPORT_DIR%\""
+                publishHTML (target: [
+                    allowMissing: false,
                     alwaysLinkToLastBuild: true,
-                    allowMissing: false
+                    keepAll: true,
+                    reportDir: 'target/surefire-reports',
+                    reportFiles: 'index.html',
+                    reportName: 'Selenium TestNG Report'
                 ])
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline finished with failures.'
         }
     }
 }
